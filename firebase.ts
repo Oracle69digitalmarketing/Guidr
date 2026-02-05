@@ -7,16 +7,16 @@ import { UserContext, Recipe } from './types';
 import { getCoachResponse } from './services/geminiService';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "guidr-shipyard.firebaseapp.com",
-  projectId: "guidr-shipyard",
-  storageBucket: "guidr-shipyard.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "YOUR_API_KEY",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "guidr-shipyard.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "guidr-shipyard",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "guidr-shipyard.appspot.com",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "YOUR_MESSAGING_SENDER_ID",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "YOUR_APP_ID"
 };
 
 // Connectivity Check: Detect if user has provided real keys
-export const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+export const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY" && firebaseConfig.apiKey !== "";
 
 let app: FirebaseApp | null = null;
 if (isConfigured) {
@@ -44,11 +44,12 @@ export const sendMessageToCoach = async (data: {
   if (functions && isConfigured) {
     try {
       const coachChat = httpsCallable(functions, 'coachChat');
-      return await coachChat({
+      const result = await coachChat({
         ...data,
         recipeId: data.guidrId,
         userId: auth?.currentUser?.uid || "mock-uid"
       });
+      return result;
     } catch (e: any) {
       console.warn("Backend Function call failed, utilizing local AI fallback.");
     }
