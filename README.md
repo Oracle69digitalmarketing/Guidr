@@ -24,7 +24,7 @@ Guidr was born out of a simple observation: most productivity tools tell you *wh
 -   **AI Engine**: Google Gemini 1.5 Flash (via `@google/genai`).
 -   **Backend**: Firebase Cloud Functions (v2), Firestore.
 -   **Payments**: RevenueCat (JS SDK).
--   **Mobile Ready**: Designed for **Capacitor** integration.
+-   **Mobile Ready**: Fully initialized with **Capacitor** for iOS and Android deployment.
 
 ## 🛠️ Getting Started
 
@@ -88,6 +88,22 @@ Deploy the Cloud Functions:
 firebase deploy --only functions
 ```
 Ensure `GEMINI_API_KEY` is set in your Firebase environment secrets or `.env` file for the functions.
+
+### Mobile App (iOS / Android)
+
+Guidr is pre-configured with Capacitor. To add mobile platforms:
+
+1.  Build the web project: `npm run build`
+2.  Add platforms:
+    ```bash
+    npx cap add ios
+    npx cap add android
+    ```
+3.  Sync and open:
+    ```bash
+    npm run cap:sync
+    npm run cap:open:ios
+    ```
 
 ## 📄 License
 
