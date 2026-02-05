@@ -61,7 +61,7 @@ exports.coachChat = onCall(async (request) => {
       }
     });
 
-    const aiResponse = response.text;
+    const aiResponse = response.text || "I'm sorry, I couldn't quite catch that. Could you say it again?";
 
     // 4. Save to history
     await db.collection('conversations').add({
