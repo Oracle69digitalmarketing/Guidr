@@ -44,11 +44,12 @@ export const sendMessageToCoach = async (data: {
   if (functions && isConfigured) {
     try {
       const coachChat = httpsCallable(functions, 'coachChat');
-      return await coachChat({
+      const result = await coachChat({
         ...data,
         recipeId: data.guidrId,
         userId: auth?.currentUser?.uid || "mock-uid"
       });
+      return result;
     } catch (e: any) {
       console.warn("Backend Function call failed, utilizing local AI fallback.");
     }

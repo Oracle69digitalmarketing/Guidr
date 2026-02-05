@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import Layout from '../components/Layout';
 import ChatInput from '../components/ChatInput';
 import { ChatMessage } from '../types';
@@ -91,7 +92,13 @@ const CoachChat: React.FC = () => {
           return (
             <div key={index} className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
               <div className={`relative max-w-[85%] px-4 py-2.5 rounded-2xl text-[15px] ${isUser ? 'bg-primary text-white rounded-br-none' : 'bg-surface text-slate-100 border border-border/30 rounded-bl-none'}`}>
-                {msg.content}
+                {isUser ? (
+                  msg.content
+                ) : (
+                  <div className="prose prose-invert prose-sm max-w-none">
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
+                )}
                 <div className={`absolute bottom-0 w-4 h-4 ${isUser ? '-right-1' : '-left-1'}`}>
                    <div className={`w-full h-full ${isUser ? 'bg-primary' : 'bg-surface border-l border-b border-border/30'} rotate-45 transform origin-bottom`}></div>
                 </div>
