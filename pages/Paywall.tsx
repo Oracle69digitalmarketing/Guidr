@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { getOfferings, purchasePackage, restorePurchases } from '../services/revenueCatService';
-import { PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-js';
+import { Offering, Package, PackageType } from '@revenuecat/purchases-js';
 
 const Paywall: React.FC = () => {
   const navigate = useNavigate();
-  const [offering, setOffering] = useState<PurchasesOffering | null>(null);
+  const [offering, setOffering] = useState<Offering | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
 
@@ -20,7 +20,7 @@ const Paywall: React.FC = () => {
     load();
   }, []);
 
-  const handlePurchase = async (pkg: PurchasesPackage) => {
+  const handlePurchase = async (pkg: Package) => {
     setPurchasing(true);
     const success = await purchasePackage(pkg);
     if (success) {
@@ -84,12 +84,12 @@ const Paywall: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div className="text-left">
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">
-                    {pkg.packageType === 'ANNUAL' ? 'Best Value' : 'Monthly Access'}
+                    {pkg.packageType === PackageType.Annual ? 'Best Value' : 'Monthly Access'}
                   </p>
-                  <p className="text-xl font-bold">{pkg.product.title}</p>
+                  <p className="text-xl font-bold">{pkg.rcBillingProduct.title}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-black">{pkg.product.priceString}</p>
+                  <p className="text-2xl font-black">{pkg.rcBillingProduct.currentPrice.formattedPrice}</p>
                   <p className="text-[10px] opacity-70">No hidden fees</p>
                 </div>
               </div>
