@@ -2,8 +2,6 @@
 
 Guidr is a high-performance personal coaching application designed to help you find clarity, reflect on your progress, and optimize your daily life. Built with React 19, Vite, and powered by Google's Gemini 1.5 Flash, Guidr provides a seamless, intelligent coaching experience across web and mobile.
 
-![Guidr Banner](https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6)
-
 ## ✨ Features
 
 -   **Intelligent Coaching Spaces**: Choose from specialized modules like the Weekly Review System, Decision Matrix, or Energy Audit.
