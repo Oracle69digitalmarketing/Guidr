@@ -2,7 +2,7 @@
 import { Purchases, Package } from '@revenuecat/purchases-js';
 
 const REVENUECAT_KEYS = {
-  web: import.meta.env.VITE_REVENUECAT_API_KEY || "goog_placeholder_key",
+  web: (process.env as any).VITE_REVENUECAT_API_KEY || "goog_placeholder_key",
 };
 
 export interface SubscriptionStatus {

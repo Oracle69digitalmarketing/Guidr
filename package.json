@@ -12,8 +12,6 @@
     "cap:open:android": "npx cap open android"
   },
   "dependencies": {
-    "@capacitor/cli": "^8.0.2",
-    "@capacitor/core": "^8.0.2",
     "@google/genai": "latest",
     "@revenuecat/purchases-js": "0.3.0",
     "firebase": "^12.8.0",

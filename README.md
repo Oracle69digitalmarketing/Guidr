@@ -1,22 +1,15 @@
 # Guidr | Your AI-Powered Personal Growth Companion
 
-**Live Demo**: [https://guidr-sooty.vercel.app/](https://guidr-sooty.vercel.app/)
-
-## 📖 Project Story
-
-Guidr was born out of a simple observation: most productivity tools tell you *what* to do, but very few help you reflect on *how* you're doing. Inspired by the "Weekly Review" methodology and built for the **RevenueCat Shipyard contest**, Guidr is designed to be a thoughtful companion that bridges the gap between raw task lists and deep personal reflection. It uses advanced AI to guide users through structured coaching "recipes" that promote clarity, reduce friction, and align daily actions with long-term quarterly goals.
-
-![Guidr Banner](https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6)
+Guidr is a high-performance personal coaching application designed to help you find clarity, reflect on your progress, and optimize your daily life. Built with React 19, Vite, and powered by Google's Gemini 1.5 Flash, Guidr provides a seamless, intelligent coaching experience across web and mobile.
 
 ## ✨ Features
 
--   **Intelligent Coaching Spaces**: Specialized modules like the Weekly Review System, Decision Matrix, and Energy Audit.
--   **Context-Aware AI**: Powered by **Gemini 1.5 Flash**, the coach remembers your quarterly goals and current sentiment for hyper-personalized guidance.
--   **Multi-Platform Mobility**: A responsive web application built to be wrapped with **Capacitor**, enabling seamless deployment to iOS and Android as a native app.
--   **Professional AI Rendering**: Full Markdown support in chat for clear, structured advice.
+-   **Intelligent Coaching Spaces**: Choose from specialized modules like the Weekly Review System, Decision Matrix, or Energy Audit.
+-   **Context-Aware AI**: The AI coach understands your quarterly goals and current sentiment to provide personalized advice.
+-   **Seamless Multi-Platform**: Responsive design optimized for both desktop and mobile views.
 -   **Secure Authentication**: Robust user management powered by Firebase Auth.
--   **Cloud-Synced History**: Conversations and user context are securely persisted in Firestore.
--   **RevenueCat Integration**: A production-ready paywall system for premium coaching tiers.
+-   **Cloud-Synced History**: Never lose a conversation. Your chat history and context are securely stored in Firestore.
+-   **Premium Access**: Integrated with RevenueCat for advanced coaching modules and premium features.
 
 ## 🚀 Tech Stack
 
@@ -24,7 +17,7 @@ Guidr was born out of a simple observation: most productivity tools tell you *wh
 -   **AI Engine**: Google Gemini 1.5 Flash (via `@google/genai`).
 -   **Backend**: Firebase Cloud Functions (v2), Firestore.
 -   **Payments**: RevenueCat (JS SDK).
--   **Mobile Ready**: Fully initialized with **Capacitor** for iOS and Android deployment.
+-   **Icons**: FontAwesome.
 
 ## 🛠️ Getting Started
 
@@ -33,23 +26,24 @@ Guidr was born out of a simple observation: most productivity tools tell you *wh
 -   Node.js (v20+)
 -   A Google AI Studio API Key ([Get one here](https://aistudio.google.com/apikey))
 -   A Firebase Project
--   A RevenueCat Project
+-   A RevenueCat Project (optional for local development)
 
 ### Installation
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/Oracle69digitalmarketing/Guidr.git
+    git clone https://github.com/your-repo/guidr.git
     cd guidr
     ```
 2.  Install dependencies:
     ```bash
     npm install
     ```
+3.  Set up your environment variables (see below).
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory:
+Create a `.env.local` file in the root directory and add the following:
 
 ```env
 # Gemini AI
@@ -77,34 +71,24 @@ The app will be available at `http://localhost:3000`.
 
 ## 📦 Production Deployment
 
-### Frontend (Vercel / Render)
+### Frontend (Vercel / Render / Netlify)
 
-Configure all `VITE_` environment variables in your deployment platform's dashboard. The app is optimized for Vercel deployment.
+Ensure all `VITE_` environment variables listed above are configured in your deployment platform's settings.
 
 ### Backend (Firebase Functions)
 
-Deploy the Cloud Functions:
+Deploy the Cloud Functions provided in `functions-index.ts` (or `functions-index.js`):
+
 ```bash
 firebase deploy --only functions
 ```
-Ensure `GEMINI_API_KEY` is set in your Firebase environment secrets or `.env` file for the functions.
 
-### Mobile App (iOS / Android)
-
-Guidr is pre-configured with Capacitor. To add mobile platforms:
-
-1.  Build the web project: `npm run build`
-2.  Add platforms:
-    ```bash
-    npx cap add ios
-    npx cap add android
-    ```
-3.  Sync and open:
-    ```bash
-    npm run cap:sync
-    npm run cap:open:ios
-    ```
+Set the `GEMINI_API_KEY` in your Firebase Function environment:
+```bash
+firebase functions:config:set gemini.api_key="YOUR_KEY"
+```
+*Note: For v2 functions, prefer using Secret Manager or `.env` files within the functions directory.*
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
