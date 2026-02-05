@@ -7,16 +7,16 @@ import { UserContext, Recipe } from './types';
 import { getCoachResponse } from './services/geminiService';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "guidr-shipyard.firebaseapp.com",
-  projectId: "guidr-shipyard",
-  storageBucket: "guidr-shipyard.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: (process.env as any).VITE_FIREBASE_API_KEY || "YOUR_API_KEY",
+  authDomain: (process.env as any).VITE_FIREBASE_AUTH_DOMAIN || "guidr-shipyard.firebaseapp.com",
+  projectId: (process.env as any).VITE_FIREBASE_PROJECT_ID || "guidr-shipyard",
+  storageBucket: (process.env as any).VITE_FIREBASE_STORAGE_BUCKET || "guidr-shipyard.appspot.com",
+  messagingSenderId: (process.env as any).VITE_FIREBASE_MESSAGING_SENDER_ID || "YOUR_MESSAGING_SENDER_ID",
+  appId: (process.env as any).VITE_FIREBASE_APP_ID || "YOUR_APP_ID"
 };
 
 // Connectivity Check: Detect if user has provided real keys
-export const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+export const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY" && firebaseConfig.apiKey !== "";
 
 let app: FirebaseApp | null = null;
 if (isConfigured) {
