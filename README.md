@@ -39,7 +39,7 @@ Guidr was born out of a simple observation: most productivity tools tell you *wh
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-repo/guidr.git
+    git clone https://github.com/Oracle69digitalmarketing/Guidr.git
     cd guidr
     ```
 2.  Install dependencies:
