@@ -8,13 +8,14 @@ import { SYSTEM_PROMPTS } from "../constants";
  * Note: For production, always route through Cloud Functions for security.
  */
 export const getCoachResponse = async (payload: SendMessagePayload, userContextStr: string) => {
-  // Use process.env.API_KEY directly as per guidelines
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Use import.meta.env for Vite compatibility
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (process.env as any).GEMINI_API_KEY || "";
+  const ai = new GoogleGenAI({ apiKey });
   
   const systemInstruction = (SYSTEM_PROMPTS[payload.recipeId] || "You are a helpful and warm coach.") + 
     (userContextStr ? `\n\nAbout the user: ${userContextStr}` : "");
 
-  // Convert history to Gemini format, ensuring we don't duplicate the last user message
+  // Convert history to Gemini format
   const chatHistory = payload.messageHistory.map(msg => ({
     role: msg.role === 'user' ? 'user' : 'model',
     parts: [{ text: msg.content }]
@@ -22,7 +23,7 @@ export const getCoachResponse = async (payload: SendMessagePayload, userContextS
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-1.5-flash',
       contents: chatHistory,
       config: {
         systemInstruction,
@@ -30,7 +31,6 @@ export const getCoachResponse = async (payload: SendMessagePayload, userContextS
       }
     });
 
-    // Directly access the .text property
     return response.text || "I'm sorry, I couldn't quite catch that. Could you say it again?";
   } catch (error) {
     console.error("Gemini SDK Fallback Error:", error);

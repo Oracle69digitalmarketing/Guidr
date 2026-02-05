@@ -4,7 +4,7 @@
  * Filename: functions/index.js
  */
 
-const functions = require('firebase-functions');
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require('firebase-admin');
 const { GoogleGenAI } = require("@google/genai");
 
@@ -23,16 +23,15 @@ Your goal is to guide the user through a structured, reflective weekly review.
   energy_audit_v1: `You are "Energy," a mindful sustainability coach.`
 };
 
-exports.coachChat = functions.https.onCall(async (data, context) => {
+exports.coachChat = onCall(async (request) => {
   // 1. Authentication check
-  if (!context.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'You must be logged in.');
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'You must be logged in.');
   }
 
-  // Support both 'recipeId' and 'guidrId' for compatibility
-  const guidrId = data.guidrId || data.recipeId;
-  const messageHistory = data.messageHistory || [];
-  const userId = context.auth.uid;
+  const { guidrId, recipeId, messageHistory = [] } = request.data;
+  const targetId = guidrId || recipeId;
+  const userId = request.auth.uid;
 
   // 2. Fetch User Context
   let userContextText = '';
@@ -47,19 +46,19 @@ exports.coachChat = functions.https.onCall(async (data, context) => {
   }
 
   // 3. Initialize Gemini
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const model = 'gemini-3-flash-preview';
-
-  const systemInstruction = (SYSTEM_PROMPTS[guidrId] || "You are a helpful coach.") + userContextText;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+  const ai = new GoogleGenAI({ apiKey });
 
   try {
     const response = await ai.models.generateContent({
-      model,
+      model: 'gemini-1.5-flash',
       contents: messageHistory.map(m => ({
         role: m.role === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }]
       })),
-      config: { systemInstruction }
+      config: {
+        systemInstruction: (SYSTEM_PROMPTS[targetId] || "You are a helpful coach.") + userContextText
+      }
     });
 
     const aiResponse = response.text;
@@ -67,7 +66,7 @@ exports.coachChat = functions.https.onCall(async (data, context) => {
     // 4. Save to history
     await db.collection('conversations').add({
       userId,
-      guidrId,
+      guidrId: targetId,
       messages: [...messageHistory, { role: 'assistant', content: aiResponse }],
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -75,6 +74,6 @@ exports.coachChat = functions.https.onCall(async (data, context) => {
     return { response: aiResponse };
   } catch (error) {
     console.error("Gemini Error:", error);
-    throw new functions.https.HttpsError('internal', 'Failed to get a response.');
+    throw new HttpsError('internal', 'Failed to get a response.');
   }
 });

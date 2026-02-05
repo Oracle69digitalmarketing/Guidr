@@ -1,8 +1,8 @@
 
-import { Purchases, PurchasesPackage } from '@revenuecat/purchases-js';
+import { Purchases, Package } from '@revenuecat/purchases-js';
 
 const REVENUECAT_KEYS = {
-  web: "goog_placeholder_key", 
+  web: import.meta.env.VITE_REVENUECAT_API_KEY || "goog_placeholder_key",
 };
 
 export interface SubscriptionStatus {
@@ -54,12 +54,12 @@ export const getOfferings = async () => {
 /**
  * Executes the purchase for a specific package.
  */
-export const purchasePackage = async (pack: PurchasesPackage) => {
+export const purchasePackage = async (pack: Package) => {
   try {
-    const { customerInfo } = await Purchases.getSharedInstance().purchasePackage(pack);
+    const { customerInfo } = await Purchases.getSharedInstance().purchase({ rcPackage: pack });
     return !!customerInfo.entitlements.active['premium'];
   } catch (e: any) {
-    if (!e.userCancelled) {
+    if (e.errorCode !== 1) { // 1 is UserCancelledError in ErrorCode enum
       console.error("RevenueCat: Purchase failed", e);
     }
     return false;
@@ -68,7 +68,9 @@ export const purchasePackage = async (pack: PurchasesPackage) => {
 
 export const restorePurchases = async () => {
   try {
-    const customerInfo = await Purchases.getSharedInstance().restorePurchases();
+    // In @revenuecat/purchases-js, there is no restorePurchases method.
+    // getCustomerInfo() can be used to refresh the customer info.
+    const customerInfo = await Purchases.getSharedInstance().getCustomerInfo();
     return !!customerInfo.entitlements.active['premium'];
   } catch (e) {
     return false;
