@@ -1,11 +1,11 @@
 ```markdown
-# Guidr | Your AI-Powered Personal Growth Companion
+#Guidr | Your AI-Powered Personal Growth Companion
 
 **Live Demo:** [https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)
 
 Guidr is a high-performance personal coaching application designed to help you find clarity, reflect on your progress, and optimize your daily life. Built with React 19, Vite, and powered by Google's Gemini 1.5 Flash, Guidr provides a seamless, intelligent coaching experience across web and mobile.
 
-## 🎯 Project Story
+##🎯 Project Story
 
 Guidr was conceived and built for the **RevenueCat Shipyard: Creator Contest**, specifically for creator **Simon (Better Creating)**. Inspired by his brief for a "minimalist AI coaching app," we set out to solve the core problem his audience faces: the gap between inspiration and systematic action. Rather than building another open-ended chatbot, we created **Guidr**—a platform that productizes coaching methodologies into structured, step-by-step "Coaching Spaces." This project combines a passion for product-building with modern full-stack development to deliver a tool that is both beautifully designed and deeply practical for users obsessed with productivity and systems.
 
