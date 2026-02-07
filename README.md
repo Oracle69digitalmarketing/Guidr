@@ -1,30 +1,30 @@
 # Guidr | Your AI-Powered Personal Growth Companion
 
-**Live Demo**: [https://guidr-sooty.vercel.app/](https://guidr-sooty.vercel.app/)
+**Live Demo:** [https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)
 
-## 📖 Project Story
+Guidr is a high-performance personal coaching application designed to help you find clarity, reflect on your progress, and optimize your daily life. Built with React 19, Vite, and powered by Google's Gemini 1.5 Flash, Guidr provides a seamless, intelligent coaching experience across web and mobile.
 
-Guidr was born out of a simple observation: most productivity tools tell you *what* to do, but very few help you reflect on *how* you're doing. Inspired by the "Weekly Review" methodology and built for the **RevenueCat Shipyard contest**, Guidr is designed to be a thoughtful companion that bridges the gap between raw task lists and deep personal reflection. It uses advanced AI to guide users through structured coaching "recipes" that promote clarity, reduce friction, and align daily actions with long-term quarterly goals.
+## 🎯 Project Story
 
-![Guidr Banner](https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6)
+Guidr was conceived and built for the **RevenueCat Shipyard: Creator Contest**, specifically for creator **Simon (Better Creating)**. Inspired by his brief for a "minimalist AI coaching app," we set out to solve the core problem his audience faces: the gap between inspiration and systematic action. Rather than building another open-ended chatbot, we created **Guidr**—a platform that productizes coaching methodologies into structured, step-by-step "Coaching Spaces." This project combines a passion for product-building with modern full-stack development to deliver a tool that is both beautifully designed and deeply practical for users obsessed with productivity and systems.
 
 ## ✨ Features
 
--   **Intelligent Coaching Spaces**: Specialized modules like the Weekly Review System, Decision Matrix, and Energy Audit.
--   **Context-Aware AI**: Powered by **Gemini 1.5 Flash**, the coach remembers your quarterly goals and current sentiment for hyper-personalized guidance.
--   **Multi-Platform Mobility**: Fully initialized with **Capacitor**, enabling seamless deployment to iOS and Android as a native app from the same codebase.
--   **Professional AI Rendering**: Full Markdown support in chat for clear, structured advice, with built-in "Copy to Clipboard" for key insights.
+-   **Intelligent Coaching Spaces**: Choose from specialized modules like the Weekly Review System, Decision Matrix, or Energy Audit.
+-   **Context-Aware AI**: The AI coach understands your quarterly goals and current sentiment to provide personalized advice.
+-   **Seamless Multi-Platform**: A responsive web app built with React, easily packaged for native iOS and Android submission using **Capacitor**.
 -   **Secure Authentication**: Robust user management powered by Firebase Auth.
--   **Cloud-Synced History**: Conversations and user context are securely persisted in Firestore.
--   **RevenueCat Integration**: A production-ready paywall system for premium coaching tiers.
+-   **Cloud-Synced History**: Never lose a conversation. Your chat history and context are securely stored in Firestore.
+-   **Premium Access**: Integrated with RevenueCat for advanced coaching modules and premium features.
 
 ## 🚀 Tech Stack
 
 -   **Frontend**: React 19, TypeScript, Vite, Tailwind CSS.
+-   **Mobile Wrapper**: Capacitor (for native iOS/Android builds).
 -   **AI Engine**: Google Gemini 1.5 Flash (via `@google/genai`).
 -   **Backend**: Firebase Cloud Functions (v2), Firestore.
 -   **Payments**: RevenueCat (JS SDK).
--   **Mobile Integration**: **Capacitor** (initialized and ready for platform addition).
+-   **Icons**: FontAwesome.
 
 ## 🛠️ Getting Started
 
@@ -33,7 +33,7 @@ Guidr was born out of a simple observation: most productivity tools tell you *wh
 -   Node.js (v20+)
 -   A Google AI Studio API Key ([Get one here](https://aistudio.google.com/apikey))
 -   A Firebase Project
--   A RevenueCat Project
+-   A RevenueCat Project (optional for local development)
 
 ### Installation
 
@@ -46,10 +46,11 @@ Guidr was born out of a simple observation: most productivity tools tell you *wh
     ```bash
     npm install
     ```
+3.  Set up your environment variables (see below).
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory:
+Create a `.env.local` file in the root directory and add the following:
 
 ```env
 # Gemini AI
@@ -77,37 +78,39 @@ The app will be available at `http://localhost:3000`.
 
 ## 📦 Production Deployment
 
-### Frontend (Vercel / Render)
+### Frontend (Vercel / Render / Netlify)
 
-Configure all `VITE_` environment variables in your deployment platform's dashboard. Guidr is optimized for Vercel.
+Ensure all `VITE_` environment variables listed above are configured in your deployment platform's settings.
 
 ### Backend (Firebase Functions)
 
-Deploy the Cloud Functions using the Firebase CLI:
+Deploy the Cloud Functions provided in `functions-index.ts` (or `functions-index.js`):
+
 ```bash
 firebase deploy --only functions
 ```
-*Note: The backend is pre-configured to use **Gemini 1.5 Flash** via Cloud Functions v2 for maximum security and performance.*
 
-### Mobile App (iOS / Android)
+Set the `GEMINI_API_KEY` in your Firebase Function environment:
 
-Guidr is pre-configured with **Capacitor**. To build your native mobile app:
+```bash
+firebase functions:config:set gemini.api_key="YOUR_KEY"
+```
 
-1.  Build the web project: `npm run build`
-2.  Add your desired platforms:
-    ```bash
-    npx cap add ios
-    npx cap add android
-    ```
-3.  Sync the web code to the native projects:
-    ```bash
-    npm run cap:sync
-    ```
-4.  Open in Xcode or Android Studio:
-    ```bash
-    npm run cap:open:ios
-    ```
+*Note: For v2 functions, prefer using Secret Manager or .env files within the functions directory.*
+
+## 🏗️ Architecture & RevenueCat Implementation
+
+### High-Level Architecture
+
+The frontend (React/Vite) communicates with Firebase Cloud Functions, which orchestrate the AI (Google Gemini 1.5 Flash). User data and conversation history are stored in Firestore. The RevenueCat SDK is integrated into the frontend to manage subscription states, which unlock premium content.
+
+### RevenueCat Integration Details
+
+1.  **Initialization**: The RevenueCat JS SDK is configured with platform-specific public API keys on app launch.
+2.  **Entitlements**: We created a premium entitlement. A user's access to premium Guidrs is determined by checking `Purchases.getCustomerInfo()`.
+3.  **Paywall**: A custom paywall component fetches offerings via `Purchases.getOfferings()` and triggers purchases with `Purchases.purchasePackage()`.
+4.  **Server-Side Verification (Optional)**: For enhanced security, the Cloud Function can verify a user's subscription status via the RevenueCat REST API before serving premium content.
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
