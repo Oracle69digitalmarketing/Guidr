@@ -94,7 +94,7 @@ firebase deploy --only functions
 Set the GEMINI_API_KEY in your Firebase Function environment:
 
 ```bash
-firebase functions:config:set gemini.api_key="YOUR_KEY"
+firebase functions:secrets:set GEMINI_API_KEY
 ```
 
 Note: For v2 functions, prefer using Secret Manager or .env files within the functions directory.
