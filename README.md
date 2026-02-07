@@ -40,7 +40,7 @@ Guidr was conceived and built for the **RevenueCat Shipyard: Creator Contest**, 
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-repo/guidr.git
+    git clone https://github.com/Oracle69digitalmarketing/Guidr.git
     cd guidr
     ```
 2.  Install dependencies:
