@@ -31,7 +31,7 @@ export const getCoachResponse = async (payload: SendMessagePayload, userContextS
       }
     });
 
-    return response.text || "I'm sorry, I couldn't quite catch that. Could you say it again?";
+    return response.text || "I was unable to generate a response. Please try again.";
   } catch (error) {
     console.error("Gemini SDK Fallback Error:", error);
     throw error;

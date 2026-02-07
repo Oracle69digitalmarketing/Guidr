@@ -21,6 +21,7 @@ const CoachChat: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
+  const [copyingId, setCopyingId] = useState<number | null>(null);
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -65,6 +66,19 @@ const CoachChat: React.FC = () => {
     } finally { setIsTyping(false); }
   };
 
+  const copyToClipboard = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopyingId(index);
+    setTimeout(() => setCopyingId(null), 2000);
+  };
+
+  const handleClearChat = () => {
+    if (window.confirm("Are you sure you want to clear this session?")) {
+      setMessages([{ role: 'assistant', content: greeting, timestamp: new Date() }]);
+      setSessionStarted(false);
+    }
+  };
+
   if (checkingAccess) return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background">
       <i className="fa-solid fa-lock text-primary text-4xl animate-pulse"></i>
@@ -76,13 +90,22 @@ const CoachChat: React.FC = () => {
       title={recipe?.name || "Coaching"} 
       showBack onBack={() => navigate('/')}
       actions={
-        <div className="flex items-center gap-2 bg-surface/80 px-3 py-1.5 rounded-full border border-border/50">
-          <div className="relative">
-            <div className={`w-2 h-2 rounded-full ${isTyping ? "bg-primary animate-ping" : "bg-green-500"}`}></div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleClearChat}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-surface text-slate-400 hover:text-red-400 transition-colors"
+            title="Clear Chat"
+          >
+            <i className="fa-solid fa-trash-can text-xs"></i>
+          </button>
+          <div className="flex items-center gap-2 bg-surface/80 px-3 py-1.5 rounded-full border border-border/50">
+            <div className="relative">
+              <div className={`w-2 h-2 rounded-full ${isTyping ? "bg-primary animate-ping" : "bg-green-500"}`}></div>
+            </div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              {isTyping ? "Listening..." : "Online"}
+            </span>
           </div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            {isTyping ? "Listening..." : "Online"}
-          </span>
         </div>
       }
     >
@@ -90,7 +113,7 @@ const CoachChat: React.FC = () => {
         {messages.map((msg, index) => {
           const isUser = msg.role === 'user';
           return (
-            <div key={index} className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
+            <div key={index} className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 group`}>
               <div className={`relative max-w-[85%] px-4 py-2.5 rounded-2xl text-[15px] ${isUser ? 'bg-primary text-white rounded-br-none' : 'bg-surface text-slate-100 border border-border/30 rounded-bl-none'}`}>
                 {isUser ? (
                   msg.content
