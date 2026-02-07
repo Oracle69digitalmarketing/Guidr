@@ -1,3 +1,4 @@
+```markdown
 # Guidr | Your AI-Powered Personal Growth Companion
 
 **Live Demo:** [https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)
@@ -68,49 +69,51 @@ VITE_FIREBASE_APP_ID=your_app_id
 VITE_REVENUECAT_API_KEY=your_rc_public_api_key
 ```
 
-### Running Locally
+Running Locally
 
 ```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`.
+The app will be available at http://localhost:3000.
 
-## 📦 Production Deployment
+📦 Production Deployment
 
-### Frontend (Vercel / Render / Netlify)
+Frontend (Vercel / Render / Netlify)
 
-Ensure all `VITE_` environment variables listed above are configured in your deployment platform's settings.
+Ensure all VITE_ environment variables listed above are configured in your deployment platform's settings.
 
-### Backend (Firebase Functions)
+Backend (Firebase Functions)
 
-Deploy the Cloud Functions provided in `functions-index.ts` (or `functions-index.js`):
+Deploy the Cloud Functions provided in functions-index.ts (or functions-index.js):
 
 ```bash
 firebase deploy --only functions
 ```
 
-Set the `GEMINI_API_KEY` in your Firebase Function environment:
+Set the GEMINI_API_KEY in your Firebase Function environment:
 
 ```bash
 firebase functions:config:set gemini.api_key="YOUR_KEY"
 ```
 
-*Note: For v2 functions, prefer using Secret Manager or .env files within the functions directory.*
+Note: For v2 functions, prefer using Secret Manager or .env files within the functions directory.
 
-## 🏗️ Architecture & RevenueCat Implementation
+Architecture & RevenueCat Implementation
 
-### High-Level Architecture
+High-Level Architecture
 
-The frontend (React/Vite) communicates with Firebase Cloud Functions, which orchestrate the AI (Google Gemini 1.5 Flash). User data and conversation history are stored in Firestore. The RevenueCat SDK is integrated into the frontend to manage subscription states, which unlock premium content.
+The frontend (React/Vite) communicates with Firebase Cloud Functions, which orchestrate the AI (Google Gemini 1.5 Flash). User data and conversation history are stored in Firestore. The RevenueCat SDK is integrated into the frontend to manage subscription states, which unlock premium content flagged by an isLocked field in the Firestore guidrs collection.
 
-### RevenueCat Integration Details
+RevenueCat Integration Details
 
-1.  **Initialization**: The RevenueCat JS SDK is configured with platform-specific public API keys on app launch.
-2.  **Entitlements**: We created a premium entitlement. A user's access to premium Guidrs is determined by checking `Purchases.getCustomerInfo()`.
-3.  **Paywall**: A custom paywall component fetches offerings via `Purchases.getOfferings()` and triggers purchases with `Purchases.purchasePackage()`.
-4.  **Server-Side Verification (Optional)**: For enhanced security, the Cloud Function can verify a user's subscription status via the RevenueCat REST API before serving premium content.
+1. Initialization: The RevenueCat JS SDK is configured with platform-specific public API keys on app launch.
+2. Entitlements: We created a premium entitlement. A user's access to premium Guidrs is determined by checking Purchases.getCustomerInfo().
+3. Paywall: A custom paywall component fetches offerings via Purchases.getOfferings() and triggers purchases with Purchases.purchasePackage().
+4. Server-Side Verification (Optional): For enhanced security, the Cloud Function can verify a user's subscription status via the RevenueCat REST API before serving premium content.
 
-## 📄 License
+📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+```

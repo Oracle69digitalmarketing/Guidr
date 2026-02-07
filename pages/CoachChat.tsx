@@ -122,16 +122,6 @@ const CoachChat: React.FC = () => {
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
                   </div>
                 )}
-
-                {!isUser && (
-                  <button
-                    onClick={() => copyToClipboard(msg.content, index)}
-                    className={`absolute -right-8 top-1 opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg hover:bg-surface border border-border/50 text-slate-500 hover:text-primary ${copyingId === index ? 'text-green-500 opacity-100' : ''}`}
-                  >
-                    <i className={`fa-solid ${copyingId === index ? 'fa-check' : 'fa-copy'} text-xs`}></i>
-                  </button>
-                )}
-
                 <div className={`absolute bottom-0 w-4 h-4 ${isUser ? '-right-1' : '-left-1'}`}>
                    <div className={`w-full h-full ${isUser ? 'bg-primary' : 'bg-surface border-l border-b border-border/30'} rotate-45 transform origin-bottom`}></div>
                 </div>
