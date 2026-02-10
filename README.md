@@ -1,4 +1,3 @@
-```markdown
 # Guidr | Your AI-Powered Personal Growth Companion
 
 **Live Demo:** [https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)
@@ -8,6 +7,22 @@ Guidr is a high-performance personal coaching application designed to help you f
 ## 🎯 Project Story
 
 Guidr was conceived and built for the **RevenueCat Shipyard: Creator Contest**, specifically for creator **Simon (Better Creating)**. Inspired by his brief for a "minimalist AI coaching app," we set out to solve the core problem his audience faces: the gap between inspiration and systematic action. Rather than building another open-ended chatbot, we created **Guidr**—a platform that productizes coaching methodologies into structured, step-by-step "Coaching Spaces." This project combines a passion for product-building with modern full-stack development to deliver a tool that is both beautifully designed and deeply practical for users obsessed with productivity and systems.
+
+## 📱 App Access & Testing
+
+For the RevenueCat Shipyard submission, you can access and test the app via the following methods:
+
+### 1. Web Production (Primary)
+The quickest way to test the full user journey (Auth, AI Chat, Paywall UI) is via our production Vercel deployment:
+👉 **[https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)**
+
+### 2. Mobile Testing (Native)
+Guidr is built with **Capacitor**, meaning the web production link above is identical to the native experience. To generate a native test build (for TestFlight or Play Store Internal Testing):
+1.  Ensure you have the environment variables configured.
+2.  Run `npm run build` to generate the production web assets.
+3.  Run `npx cap add ios` or `npx cap add android`.
+4.  Run `npm run cap:sync` to push the code to the native projects.
+5.  Open in Xcode/Android Studio and archive for distribution.
 
 ## ✨ Features
 
@@ -34,24 +49,23 @@ Guidr was conceived and built for the **RevenueCat Shipyard: Creator Contest**, 
 -   Node.js (v20+)
 -   A Google AI Studio API Key ([Get one here](https://aistudio.google.com/apikey))
 -   A Firebase Project
--   A RevenueCat Project (optional for local development)
+-   A RevenueCat Project
 
 ### Installation
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/Oracle69digitalmarketing/Guidr.git
+    git clone https://github.com/your-repo/guidr.git
     cd guidr
     ```
 2.  Install dependencies:
     ```bash
     npm install
     ```
-3.  Set up your environment variables (see below).
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory and add the following:
+Create a `.env.local` file in the root directory:
 
 ```env
 # Gemini AI
@@ -69,51 +83,34 @@ VITE_FIREBASE_APP_ID=your_app_id
 VITE_REVENUECAT_API_KEY=your_rc_public_api_key
 ```
 
-Running Locally
+## 📦 Production Deployment
 
-```bash
-npm run dev
-```
+### Frontend (Vercel / Render / Netlify)
 
-The app will be available at http://localhost:3000.
+Ensure all `VITE_` environment variables listed above are configured in your deployment platform's settings.
 
-📦 Production Deployment
+### Backend (Firebase Functions)
 
-Frontend (Vercel / Render / Netlify)
-
-Ensure all VITE_ environment variables listed above are configured in your deployment platform's settings.
-
-Backend (Firebase Functions)
-
-Deploy the Cloud Functions provided in functions-index.ts (or functions-index.js):
+Deploy the Cloud Functions provided in `functions-index.ts`:
 
 ```bash
 firebase deploy --only functions
 ```
 
-Set the GEMINI_API_KEY in your Firebase Function environment:
+Set the `GEMINI_API_KEY` in your Firebase Function environment.
 
-```bash
-firebase functions:secrets:set GEMINI_API_KEY
-```
+## 🏗️ Architecture & RevenueCat Implementation
 
-Note: For v2 functions, prefer using Secret Manager or .env files within the functions directory.
+### High-Level Architecture
 
-Architecture & RevenueCat Implementation
+The frontend (React/Vite) communicates with Firebase Cloud Functions, which orchestrate the AI (Google Gemini 1.5 Flash). User data and conversation history are stored in Firestore. The RevenueCat SDK is integrated into the frontend to manage subscription states, which unlock premium content.
 
-High-Level Architecture
+### RevenueCat Integration Details
 
-The frontend (React/Vite) communicates with Firebase Cloud Functions, which orchestrate the AI (Google Gemini 1.5 Flash). User data and conversation history are stored in Firestore. The RevenueCat SDK is integrated into the frontend to manage subscription states, which unlock premium content flagged by an isLocked field in the Firestore guidrs collection.
+1.  **Initialization**: The RevenueCat JS SDK is configured with platform-specific public API keys on app launch.
+2.  **Entitlements**: We created a premium entitlement. A user's access to premium Guidrs is determined by checking `Purchases.getCustomerInfo()`.
+3.  **Paywall**: A custom paywall component fetches offerings via `Purchases.getOfferings()` and triggers purchases with `Purchases.purchasePackage()`.
 
-RevenueCat Integration Details
+## 📄 License
 
-1. Initialization: The RevenueCat JS SDK is configured with platform-specific public API keys on app launch.
-2. Entitlements: We created a premium entitlement. A user's access to premium Guidrs is determined by checking Purchases.getCustomerInfo().
-3. Paywall: A custom paywall component fetches offerings via Purchases.getOfferings() and triggers purchases with Purchases.purchasePackage().
-4. Server-Side Verification (Optional): For enhanced security, the Cloud Function can verify a user's subscription status via the RevenueCat REST API before serving premium content.
-
-📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-```
+This project is licensed under the MIT License.
