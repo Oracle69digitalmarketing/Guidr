@@ -2,7 +2,7 @@
 import { Purchases, Package } from '@revenuecat/purchases-js';
 
 const REVENUECAT_KEYS = {
-  web: (process.env as any).VITE_REVENUECAT_API_KEY || "goog_placeholder_key",
+  web: import.meta.env.VITE_REVENUECAT_API_KEY || "goog_placeholder_key",
 };
 
 export interface SubscriptionStatus {
@@ -59,7 +59,7 @@ export const purchasePackage = async (pack: Package) => {
     const { customerInfo } = await Purchases.getSharedInstance().purchase({ rcPackage: pack });
     return !!customerInfo.entitlements.active['premium'];
   } catch (e: any) {
-    if (e.errorCode !== ErrorCode.PURCHASE_CANCELLED_ERROR) { // 1 is UserCancelledError in ErrorCode enum
+    if (e.errorCode !== 1) { // 1 is UserCancelledError in ErrorCode enum
       console.error("RevenueCat: Purchase failed", e);
     }
     return false;

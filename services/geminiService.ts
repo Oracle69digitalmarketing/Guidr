@@ -8,8 +8,8 @@ import { SYSTEM_PROMPTS } from "../constants";
  * Note: For production, always route through Cloud Functions for security.
  */
 export const getCoachResponse = async (payload: SendMessagePayload, userContextStr: string) => {
-  // Use process.env.GEMINI_API_KEY or API_KEY which are defined in vite.config.ts
-  const apiKey = (process.env as any).GEMINI_API_KEY || (process.env as any).API_KEY || "";
+  // Use import.meta.env for Vite compatibility
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || (process.env as any).GEMINI_API_KEY || "";
   const ai = new GoogleGenAI({ apiKey });
   
   const systemInstruction = (SYSTEM_PROMPTS[payload.recipeId] || "You are a helpful and warm coach.") + 
@@ -31,7 +31,7 @@ export const getCoachResponse = async (payload: SendMessagePayload, userContextS
       }
     });
 
-    return response.text || "I was unable to generate a response. Please try again.";
+    return response.text || "I'm sorry, I couldn't quite catch that. Could you say it again?";
   } catch (error) {
     console.error("Gemini SDK Fallback Error:", error);
     throw error;
