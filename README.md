@@ -1,12 +1,12 @@
-# Guidr | Your AI-Powered Personal Growth Companion
+# Oracle69 | Your AI-Powered Personal Growth Companion
 
 **Live Demo:** [https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)
 
-Guidr is a high-performance personal coaching application designed to help you find clarity, reflect on your progress, and optimize your daily life. Built with React 19, Vite, and powered by Google's Gemini 1.5 Flash, Guidr provides a seamless, intelligent coaching experience across web and mobile.
+Oracle69 is a high-performance personal coaching application designed to help you find clarity, reflect on your progress, and optimize your daily life. Built with React 19, Vite, and powered by Google's Gemini 1.5 Flash, Oracle69 provides a seamless, intelligent coaching experience across web and mobile.
 
 ## 🎯 Project Story
 
-Guidr was conceived and built for the **RevenueCat Shipyard: Creator Contest**, specifically for creator **Simon (Better Creating)**. Inspired by his brief for a "minimalist AI coaching app," we set out to solve the core problem his audience faces: the gap between inspiration and systematic action. Rather than building another open-ended chatbot, we created **Guidr**—a platform that productizes coaching methodologies into structured, step-by-step "Coaching Spaces." This project combines a passion for product-building with modern full-stack development to deliver a tool that is both beautifully designed and deeply practical for users obsessed with productivity and systems.
+Oracle69 was conceived and built for the **RevenueCat Shipyard: Creator Contest**, specifically for creator **Simon (Better Creating)**. Inspired by his brief for a "minimalist AI coaching app," we set out to solve the core problem his audience faces: the gap between inspiration and systematic action. Rather than building another open-ended chatbot, we created **Oracle69**—a platform that productizes coaching methodologies into structured, step-by-step "Coaching Spaces." This project combines a passion for product-building with modern full-stack development to deliver a tool that is both beautifully designed and deeply practical for users obsessed with productivity and systems.
 
 ## 📱 App Access & Testing
 
@@ -17,7 +17,7 @@ The quickest way to test the full user journey (Auth, AI Chat, Paywall UI) is vi
 👉 **[https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)**
 
 ### 2. Mobile Testing (Native)
-Guidr is built with **Capacitor**, meaning the web production link above is identical to the native experience. To generate a native test build (for TestFlight or Play Store Internal Testing):
+Oracle69 is built with **Capacitor**, meaning the web production link above is identical to the native experience. To generate a native test build (for TestFlight or Play Store Internal Testing):
 1.  Ensure you have the environment variables configured.
 2.  Run `npm run build` to generate the production web assets.
 3.  Run `npx cap add ios` or `npx cap add android`.
@@ -108,7 +108,7 @@ The frontend (React/Vite) communicates with Firebase Cloud Functions, which orch
 ### RevenueCat Integration Details
 
 1.  **Initialization**: The RevenueCat JS SDK is configured with platform-specific public API keys on app launch.
-2.  **Entitlements**: We created a premium entitlement. A user's access to premium Guidrs is determined by checking `Purchases.getCustomerInfo()`.
+2.  **Entitlements**: We created a premium entitlement. A user's access to premium Oracle69s is determined by checking `Purchases.getCustomerInfo()`.
 3.  **Paywall**: A custom paywall component fetches offerings via `Purchases.getOfferings()` and triggers purchases with `Purchases.purchasePackage()`.
 
 ## 📄 License
