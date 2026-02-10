@@ -58,7 +58,7 @@ const Settings: React.FC = () => {
               <div className="space-y-1">
                 <p className="text-sm font-bold">Current Tier</p>
                 <p className="text-xs text-slate-500">
-                  {isPro ? "Guidr Pro (Unlimited Access)" : "Free Community Member"}
+                  {isPro ? "Oracle69 Pro (Unlimited Access)" : "Free Community Member"}
                 </p>
               </div>
               {!isPro && (
@@ -98,7 +98,7 @@ const Settings: React.FC = () => {
         </section>
 
         <div className="text-center space-y-2 py-10 opacity-30">
-          <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.3em]">Guidr v1.3.0</p>
+          <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.3em]">Oracle69 v1.3.0</p>
         </div>
       </div>
     </Layout>

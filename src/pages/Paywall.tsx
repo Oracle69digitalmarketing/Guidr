@@ -44,7 +44,7 @@ const Paywall: React.FC = () => {
   ];
 
   return (
-    <Layout title="Guidr Pro" showBack onBack={() => navigate(-1)}>
+    <Layout title="Oracle69 Pro" showBack onBack={() => navigate(-1)}>
       <div className="flex-1 flex flex-col items-center justify-center py-6 px-2 text-center space-y-8 animate-in fade-in duration-700">
         <div className="relative">
           <div className="w-24 h-24 bg-gradient-primary rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/20 rotate-3">
@@ -57,7 +57,7 @@ const Paywall: React.FC = () => {
 
         <div className="space-y-2">
           <h2 className="text-3xl font-black tracking-tight">Level Up Your Life</h2>
-          <p className="text-slate-400 max-w-[280px] mx-auto text-sm">Join thousands of high-performers using Guidr Pro to stay sharp.</p>
+          <p className="text-slate-400 max-w-[280px] mx-auto text-sm">Join thousands of high-performers using Oracle69 Pro to stay sharp.</p>
         </div>
 
         <div className="w-full grid gap-4">

@@ -1,7 +1,7 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -46,22 +46,28 @@ export const coachChat = onCall(async (request) => {
   }
 
   const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || "";
-  const ai = new GoogleGenAI({ apiKey });
+  if (!apiKey) {
+    throw new HttpsError("failed-precondition", "AI API key not configured on server.");
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: SYSTEM_PROMPTS[targetRecipeId] + userContextText
+  });
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
-      contents: messageHistory.map((m: any) => ({
+    // Convert messageHistory to Google Generative AI format
+    const chat = model.startChat({
+      history: messageHistory.slice(0, -1).map((m: any) => ({
         role: m.role === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }]
       })),
-      config: { 
-        systemInstruction: SYSTEM_PROMPTS[targetRecipeId] + userContextText,
-        temperature: 0.7 
-      }
     });
 
-    const aiResponse = response.text || "I apologize, I'm processing your request. Please continue.";
+    const lastMessage = messageHistory[messageHistory.length - 1];
+    const result = await chat.sendMessage(lastMessage.content);
+    const aiResponse = result.response.text();
 
     // Async history logging (doesn't block response)
     db.collection('conversations').add({

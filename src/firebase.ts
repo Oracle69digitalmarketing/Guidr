@@ -3,16 +3,18 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 import { UserContext, Recipe } from './types';
 import { getCoachResponse } from './services/geminiService';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "YOUR_API_KEY",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAkKnq936WJECjrW5v7i80jUwzd8SZvtFA",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "guidr-shipyard.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "guidr-shipyard",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "guidr-shipyard.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "YOUR_MESSAGING_SENDER_ID",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "YOUR_APP_ID"
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "guidr-shipyard.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "769432394695",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:769432394695:web:c07ebaf62d7ee7746097e2",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-RP59LTFCM8"
 };
 
 // Connectivity Check: Detect if user has provided real keys
@@ -22,6 +24,10 @@ let app: FirebaseApp | null = null;
 if (isConfigured) {
   try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    // Initialize Analytics if supported
+    isSupported().then(supported => {
+      if (supported && app) getAnalytics(app);
+    });
   } catch (e) {
     console.error("Firebase App initialization failed", e);
   }
