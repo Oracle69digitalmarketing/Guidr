@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Oracle69</string>
-    <string name="title_activity_main">Oracle69</string>
-    <string name="package_name">com.oracle69.app</string>
-    <string name="custom_url_scheme">com.oracle69.app</string>
+    <string name="app_name">Guidr</string>
+    <string name="title_activity_main">Guidr</string>
+    <string name="package_name">com.guidr.app</string>
+    <string name="custom_url_scheme">com.guidr.app</string>
 </resources>

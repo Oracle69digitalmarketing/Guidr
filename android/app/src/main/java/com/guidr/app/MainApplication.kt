@@ -1,4 +1,4 @@
-package com.oracle69.app
+package com.guidr.app
 
 import android.app.Application
 import com.revenuecat.purchases.Purchases
@@ -12,7 +12,7 @@ class MainApplication : Application() {
         // Configure RevenueCat
         Purchases.logLevel = LogLevel.DEBUG
         Purchases.configure(
-            PurchasesConfiguration.Builder(this, BuildConfig.REVENUECAT_API_KEY)
+            PurchasesConfiguration.Builder(this, "test_XCOYiEfpVVykznqYLMGPqPAjwvt")
                 .build()
         )
     }

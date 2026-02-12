@@ -1,4 +1,4 @@
-package com.oracle69.app
+package com.guidr.app
 
 import android.os.Bundle
 import android.util.Log
