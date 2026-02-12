@@ -48,7 +48,7 @@ class MainActivity : BridgeActivity() {
     private fun checkEntitlements() {
         Purchases.sharedInstance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
-                val isPro = customerInfo.entitlements["Oracle69 Pro"]?.isActive == true
+                val isPro = customerInfo.entitlements["premium"]?.isActive == true
                 if (!isPro) {
                     Log.d(TAG, "User is not Pro. We could show paywall here.")
                     // To show paywall: paywallLauncher.launch()
