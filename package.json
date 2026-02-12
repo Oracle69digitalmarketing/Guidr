@@ -1,5 +1,5 @@
 {
-  "name": "oracle69-app",
+  "name": "guidr-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -16,21 +16,21 @@
     "@capacitor/cli": "^8.0.2",
     "@capacitor/core": "^8.0.2",
     "@google/generative-ai": "^0.21.0",
+    "@revenuecat/purchases-capacitor": "^12.1.1",
     "@revenuecat/purchases-js": "^1.25.0",
-    "firebase": "^10.13.1",
-    "firebase-admin": "^12.6.0",
-    "firebase-functions": "^6.0.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "firebase": "^12.9.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
     "@types/node": "^20.16.5",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.2.13",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.3.1",
+    "eas-cli": "^13.4.2",
     "typescript": "^5.5.3",
-    "vite": "^5.4.1"
+    "vite": "^7.3.1"
   }
 }

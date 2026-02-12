@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -44,7 +43,7 @@ const Paywall: React.FC = () => {
   ];
 
   return (
-    <Layout title="Oracle69 Pro" showBack onBack={() => navigate(-1)}>
+    <Layout title="Guidr Pro" showBack onBack={() => navigate(-1)}>
       <div className="flex-1 flex flex-col items-center justify-center py-6 px-2 text-center space-y-8 animate-in fade-in duration-700">
         <div className="relative">
           <div className="w-24 h-24 bg-gradient-primary rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/20 rotate-3">
@@ -57,7 +56,7 @@ const Paywall: React.FC = () => {
 
         <div className="space-y-2">
           <h2 className="text-3xl font-black tracking-tight">Level Up Your Life</h2>
-          <p className="text-slate-400 max-w-[280px] mx-auto text-sm">Join thousands of high-performers using Oracle69 Pro to stay sharp.</p>
+          <p className="text-slate-400 max-w-[280px] mx-auto text-sm">Join thousands of high-performers using Guidr Pro to stay sharp.</p>
         </div>
 
         <div className="w-full grid gap-4">
@@ -84,12 +83,12 @@ const Paywall: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div className="text-left">
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">
-                    {pkg.packageType === PackageType.Annual ? 'Best Value' : 'Monthly Access'}
+                    {pkg.packageType === 'ANNUAL' || pkg.packageType === PackageType.Annual ? 'Best Value' : 'Monthly Access'}
                   </p>
-                  <p className="text-xl font-bold">{pkg.rcBillingProduct.title}</p>
+                  <p className="text-xl font-bold">{pkg.product?.title || pkg.rcBillingProduct?.title}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-black">{pkg.rcBillingProduct.currentPrice.formattedPrice}</p>
+                  <p className="text-2xl font-black">{pkg.product?.priceString || pkg.rcBillingProduct?.currentPrice?.formattedPrice}</p>
                   <p className="text-[10px] opacity-70">No hidden fees</p>
                 </div>
               </div>

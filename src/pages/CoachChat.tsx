@@ -61,8 +61,9 @@ const CoachChat: React.FC = () => {
       setSessionStarted(true);
       const data = (result as any).data as { response: string };
       setMessages(prev => [...prev, { role: 'assistant', content: data.response, timestamp: new Date() }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Error connecting...", timestamp: new Date() }]);
+    } catch (error: any) {
+      const errorMsg = error.message || "Error connecting...";
+      setMessages(prev => [...prev, { role: 'assistant', content: `**Error:** ${errorMsg}`, timestamp: new Date() }]);
     } finally { setIsTyping(false); }
   };
 

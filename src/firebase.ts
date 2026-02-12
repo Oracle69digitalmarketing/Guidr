@@ -1,7 +1,7 @@
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { UserContext, Recipe } from './types';
@@ -35,7 +35,10 @@ if (isConfigured) {
 
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
-export const functions = app ? getFunctions(app) : null;
+
+// Support for non-default regions
+const region = import.meta.env.VITE_FIREBASE_REGION || 'us-central1';
+export const functions = app ? getFunctions(app, region) : null;
 
 /**
  * The unified communication bridge.
@@ -57,7 +60,10 @@ export const sendMessageToCoach = async (data: {
       });
       return result;
     } catch (e: any) {
-      console.warn("Backend Function call failed, utilizing local AI fallback.");
+      const code = e.code || 'unknown';
+      const details = e.details || '';
+      console.warn(`Backend Function 'coachChat' failed [${code}] in region ${region}:`, e.message || e, details);
+      console.info("Attempting local AI fallback...");
     }
   }
 
@@ -75,9 +81,9 @@ export const sendMessageToCoach = async (data: {
     }, contextStr);
 
     return { data: { response: responseText } };
-  } catch (err) {
-    console.error("AI Fallback Error:", err);
-    throw new Error("Connectivity lost. Please check your internet connection.");
+  } catch (err: any) {
+    console.error("AI Fallback Error:", err.message || err);
+    throw new Error(`Connectivity lost: ${err.message || "Please check your internet connection."}`);
   }
 };
 

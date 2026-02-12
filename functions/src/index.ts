@@ -89,9 +89,9 @@ export const coachChat = onCall(async (request) => {
  */
 export const saveUserContext = onCall(async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "Unauthorized.");
-  
+
   const { quarterlyGoal, weeklySentiment } = request.data;
-  
+
   try {
     await db.collection("users").doc(request.auth.uid).set({
       quarterlyGoal,

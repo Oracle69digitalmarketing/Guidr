@@ -39,7 +39,7 @@ const RecipeBrowse: React.FC = () => {
 
   return (
     <Layout 
-      title="Oracle69"
+      title="Guidr"
       actions={
         <button 
           onClick={() => navigate('/settings')}
