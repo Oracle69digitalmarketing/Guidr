@@ -97,35 +97,13 @@ Deploy the Cloud Functions provided in `functions/src/index.ts`:
 firebase deploy --only functions
 ```
 
-Set the `GEMINI_API_KEY` using Firebase Secret Manager (recommended for v2 functions):
+Set the `GEMINI_API_KEY` in your Firebase Function environment.
 
-```bash
-firebase functions:secrets:set GEMINI_API_KEY
-```
-
-## 🏗️ Architecture & Hosting
-
-### Backend & Frontend Hosting
-*   **Frontend**: Hosted on **Vercel** ([https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)).
-*   **Backend**: Hosted on **Firebase Cloud Functions** (v2).
-*   **Database**: **Firebase Firestore**.
-*   **Authentication**: **Firebase Auth**.
+## 🏗️ Architecture & RevenueCat Implementation
 
 ### High-Level Architecture
+
 The frontend (React/Vite) communicates with Firebase Cloud Functions, which orchestrate the AI (Google Gemini 1.5 Flash). User data and conversation history are stored in Firestore. The RevenueCat SDK is integrated into the frontend to manage subscription states, which unlock premium content.
-
-## 🛠️ Debugging "Error connecting..."
-If you see an "Error connecting..." message in the chat, it usually indicates a missing or misconfigured API key.
-
-### 1. Check Gemini API Keys
-*   **Backend**: Ensure the `GEMINI_API_KEY` is set in your Firebase project. Use `firebase functions:secrets:set GEMINI_API_KEY`.
-*   **Frontend Fallback**: Ensure `VITE_GEMINI_API_KEY` is set in your Vercel Environment Variables if you are testing without a deployed backend.
-
-### 2. Firebase Region Mismatch
-The app defaults to `us-central1`. If your functions are deployed to a different region, set the `VITE_FIREBASE_REGION` environment variable in Vercel.
-
-### 3. Firebase Project Config
-Ensure the Firebase config in `src/firebase.ts` matches your current project.
 
 ### RevenueCat Integration Details
 

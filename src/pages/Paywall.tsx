@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -7,7 +6,7 @@ import { Offering, Package, PackageType } from '@revenuecat/purchases-js';
 
 const Paywall: React.FC = () => {
   const navigate = useNavigate();
-  const [offering, setOffering] = useState<any>(null);
+  const [offering, setOffering] = useState<Offering | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
 
@@ -20,7 +19,7 @@ const Paywall: React.FC = () => {
     load();
   }, []);
 
-  const handlePurchase = async (pkg: any) => {
+  const handlePurchase = async (pkg: Package) => {
     setPurchasing(true);
     const success = await purchasePackage(pkg);
     if (success) {
