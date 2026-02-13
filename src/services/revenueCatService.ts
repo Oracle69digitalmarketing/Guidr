@@ -1,3 +1,4 @@
+
 import { Purchases as PurchasesJS, Package as PackageJS } from '@revenuecat/purchases-js';
 import { Purchases as PurchasesCapacitor } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
