@@ -10,7 +10,7 @@ import { SYSTEM_PROMPTS } from "../constants";
 export const getCoachResponse = async (payload: SendMessagePayload, userContextStr: string) => {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
   if (!apiKey) {
-    throw new Error("h h Key missing in environment.");
+    throw new Error("Gemini API Key missing in environment.");
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -24,11 +24,18 @@ export const getCoachResponse = async (payload: SendMessagePayload, userContextS
   });
 
   try {
+    // Gemini requires the first message in history to be from 'user'.
+    // We skip any initial assistant messages (like the greeting).
+    const history = payload.messageHistory.slice(0, -1);
+    const firstUserIndex = history.findIndex(m => m.role === 'user');
+
+    const geminiHistory = (firstUserIndex === -1 ? [] : history.slice(firstUserIndex)).map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }]
+    }));
+
     const chat = model.startChat({
-      history: payload.messageHistory.slice(0, -1).map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }]
-      })),
+      history: geminiHistory,
     });
 
     const lastMessage = payload.messageHistory[payload.messageHistory.length - 1];
