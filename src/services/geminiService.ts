@@ -24,15 +24,29 @@ export const getCoachResponse = async (payload: SendMessagePayload, userContextS
   });
 
   try {
-    // Gemini requires the first message in history to be from 'user'.
-    // We skip any initial assistant messages (like the greeting).
-    const history = payload.messageHistory.slice(0, -1);
-    const firstUserIndex = history.findIndex(m => m.role === 'user');
+    // Gemini requires the history to:
+    // 1. Start with a 'user' message.
+    // 2. Alternate between 'user' and 'model'.
+    // 3. End with a 'model' message before we send the next 'user' message.
+    const geminiHistory: any[] = [];
+    let expectedRole = 'user';
 
-    const geminiHistory = (firstUserIndex === -1 ? [] : history.slice(firstUserIndex)).map(msg => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }]
-    }));
+    // We iterate through all messages EXCEPT the last one (which we will send via sendMessage)
+    for (const msg of payload.messageHistory.slice(0, -1)) {
+      const role = msg.role === 'user' ? 'user' : 'model';
+      if (role === expectedRole) {
+        geminiHistory.push({
+          role: role,
+          parts: [{ text: msg.content }]
+        });
+        expectedRole = role === 'user' ? 'model' : 'user';
+      }
+    }
+
+    // Ensure history ends with a 'model' message so the next sendMessage('user') is valid.
+    if (geminiHistory.length > 0 && geminiHistory[geminiHistory.length - 1].role === 'user') {
+      geminiHistory.pop();
+    }
 
     const chat = model.startChat({
       history: geminiHistory,
