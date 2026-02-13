@@ -2,6 +2,8 @@
 
 **Live Demo:** [https://guidr-sooty.vercel.app](https://guidr-sooty.vercel.app)
 
+[https://appdistribution.firebase.dev/i/935d6593c7e55fe2](https://appdistribution.firebase.dev/i/935d6593c7e55fe2)
+
 Guidr is a high-performance personal coaching application designed to help you find clarity, reflect on your progress, and optimize your daily life. Built with React 19, Vite, and powered by Google's Gemini 1.5 Flash, Guidr provides a seamless, intelligent coaching experience across web and mobile.
 
 ## 🎯 Project Story
