@@ -46,14 +46,11 @@ exports.coachChat = (0, https_1.onCall)(async (request) => {
         systemInstruction: SYSTEM_PROMPTS[targetRecipeId] + userContextText
     });
     try {
-        const history = messageHistory.slice(0, -1);
-        const firstUserIndex = history.findIndex((m) => m.role === 'user');
-        const geminiHistory = (firstUserIndex === -1 ? [] : history.slice(firstUserIndex)).map((m) => ({
-            role: m.role === 'user' ? 'user' : 'model',
-            parts: [{ text: m.content }]
-        }));
         const chat = model.startChat({
-            history: geminiHistory,
+            history: messageHistory.slice(0, -1).map((m) => ({
+                role: m.role === 'user' ? 'user' : 'model',
+                parts: [{ text: m.content }]
+            })),
         });
         const lastMessage = messageHistory[messageHistory.length - 1];
         const result = await chat.sendMessage(lastMessage.content);

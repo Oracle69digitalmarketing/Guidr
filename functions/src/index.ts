@@ -57,19 +57,12 @@ export const coachChat = onCall(async (request) => {
   });
 
   try {
-    // Gemini requires the first message in history to be from 'user'.
-    // We skip any initial assistant messages (like the greeting).
-    const history = messageHistory.slice(0, -1);
-    const firstUserIndex = history.findIndex((m: any) => m.role === 'user');
-
-    const geminiHistory = (firstUserIndex === -1 ? [] : history.slice(firstUserIndex)).map((m: any) => ({
-      role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.content }]
-    }));
-
     // Convert messageHistory to Google Generative AI format
     const chat = model.startChat({
-      history: geminiHistory,
+      history: messageHistory.slice(0, -1).map((m: any) => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }]
+      })),
     });
 
     const lastMessage = messageHistory[messageHistory.length - 1];
