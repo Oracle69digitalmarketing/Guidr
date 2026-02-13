@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Guidr",
+    "slug": "guidr-app",
+    "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "5e5a538f-8b01-42b3-a0ed-41ff6254b35d"
+      }
+    }
+  }
+}
