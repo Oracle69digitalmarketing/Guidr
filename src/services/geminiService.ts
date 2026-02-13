@@ -1,7 +1,19 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { SendMessagePayload } from "../types";
-import { SYSTEM_PROMPTS } from "../constants";
+import { db } from "../firebase"; // Import db from firebase.ts
+
+const getPromptFromFirestore = async (promptId: string) => {
+  try {
+    const promptDoc = await db.collection('prompts').doc(promptId).get();
+    if (promptDoc.exists) {
+      return promptDoc.data()?.content;
+    }
+  } catch (error) {
+    console.error("Error fetching prompt from Firestore:", error);
+  }
+  return null;
+};
 
 /**
  * Fallback service for direct Gemini calls if Cloud Functions are unavailable.
@@ -15,11 +27,17 @@ export const getCoachResponse = async (payload: SendMessagePayload, userContextS
 
   const genAI = new GoogleGenerativeAI(apiKey);
 
-  const systemInstruction = (SYSTEM_PROMPTS[payload.recipeId] || "You are a helpful and warm coach.") +
+  let systemInstruction = "You are a helpful and warm coach."; // Default system instruction
+  const firestorePrompt = await getPromptFromFirestore(payload.recipeId);
+  if (firestorePrompt) {
+    systemInstruction = firestorePrompt;
+  }
+
+  systemInstruction = (systemInstruction) +
     (userContextStr ? `\n\nAbout the user: ${userContextStr}` : "");
 
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-pro",
     systemInstruction
   });
 

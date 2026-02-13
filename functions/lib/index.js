@@ -42,7 +42,7 @@ exports.coachChat = (0, https_1.onCall)(async (request) => {
     }
     const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-pro",
         systemInstruction: SYSTEM_PROMPTS[targetRecipeId] + userContextText
     });
     try {
