@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveUserContext = exports.coachChat = void 0;
-const https_1 = require("firebase-functions/v2/https");
+const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const generative_ai_1 = require("@google/generative-ai");
 admin.initializeApp();
@@ -13,19 +13,19 @@ const getPromptFromFirestore = async (promptId) => {
     }
     return promptDoc.data()?.content;
 };
-exports.coachChat = (0, https_1.onCall)(async (request) => {
-    if (!request.auth) {
-        throw new https_1.HttpsError("unauthenticated", "Authentication required.");
+exports.coachChat = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
     }
-    const { recipeId, guidrId, messageHistory = [] } = request.data;
+    const { recipeId, guidrId, messageHistory = [] } = data;
     const targetRecipeId = recipeId || guidrId;
-    const userId = request.auth.uid;
+    const userId = context.auth.uid;
     if (!targetRecipeId) {
-        throw new https_1.HttpsError("invalid-argument", "Missing recipeId.");
+        throw new functions.https.HttpsError("invalid-argument", "Missing recipeId.");
     }
     const systemInstructionFromFirestore = await getPromptFromFirestore(targetRecipeId);
     if (!systemInstructionFromFirestore) {
-        throw new https_1.HttpsError("not-found", `System instruction for recipeId: ${targetRecipeId} not found.`);
+        throw new functions.https.HttpsError("not-found", `System instruction for recipeId: ${targetRecipeId} not found.`);
     }
     let userContextText = '';
     try {
@@ -42,7 +42,7 @@ exports.coachChat = (0, https_1.onCall)(async (request) => {
     }
     const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || "";
     if (!apiKey) {
-        throw new https_1.HttpsError("failed-precondition", "AI API key not configured on server.");
+        throw new functions.https.HttpsError("failed-precondition", "AI API key not configured on server.");
     }
     const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
@@ -81,15 +81,15 @@ exports.coachChat = (0, https_1.onCall)(async (request) => {
     }
     catch (error) {
         console.error("Gemini Execution Error:", error);
-        throw new https_1.HttpsError("internal", "AI Service currently unavailable.");
+        throw new functions.https.HttpsError("internal", "AI Service currently unavailable.");
     }
 });
-exports.saveUserContext = (0, https_1.onCall)(async (request) => {
-    if (!request.auth)
-        throw new https_1.HttpsError("unauthenticated", "Unauthorized.");
-    const { quarterlyGoal, weeklySentiment } = request.data;
+exports.saveUserContext = functions.https.onCall(async (data, context) => {
+    if (!context.auth)
+        throw new functions.https.HttpsError("unauthenticated", "Unauthorized.");
+    const { quarterlyGoal, weeklySentiment } = data;
     try {
-        await db.collection("users").doc(request.auth.uid).set({
+        await db.collection("users").doc(context.auth.uid).set({
             quarterlyGoal,
             weeklySentiment,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
@@ -98,7 +98,7 @@ exports.saveUserContext = (0, https_1.onCall)(async (request) => {
     }
     catch (e) {
         console.error("Firestore persistence failure:", e);
-        throw new https_1.HttpsError("internal", "Failed to save context.");
+        throw new functions.https.HttpsError("internal", "Failed to save context.");
     }
 });
 //# sourceMappingURL=index.js.map

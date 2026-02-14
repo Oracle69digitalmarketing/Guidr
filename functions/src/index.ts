@@ -1,7 +1,8 @@
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import * as functions from "firebase-functions";
+
 import * as admin from "firebase-admin";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import {GoogleGenerativeAI} from "@google/generative-ai";
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -18,23 +19,23 @@ const getPromptFromFirestore = async (promptId: string) => {
  * CLOUD FUNCTION: coachChat
  * High-performance coaching logic with Gemini 1.5 Flash.
  */
-export const coachChat = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Authentication required.");
+export const coachChat = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const { recipeId, guidrId, messageHistory = [] } = request.data;
+    const {recipeId, guidrId, messageHistory = []} = data;
   const targetRecipeId = recipeId || guidrId;
-  const userId = request.auth.uid;
+  const userId = context.auth.uid;
 
   if (!targetRecipeId) {
-    throw new HttpsError("invalid-argument", "Missing recipeId.");
+    throw new functions.https.HttpsError("invalid-argument", "Missing recipeId.");
   }
 
   const systemInstructionFromFirestore = await getPromptFromFirestore(targetRecipeId);
 
   if (!systemInstructionFromFirestore) {
-    throw new HttpsError("not-found", `System instruction for recipeId: ${targetRecipeId} not found.`);
+    throw new functions.https.HttpsError("not-found", `System instruction for recipeId: ${targetRecipeId} not found.`);
   }
 
   // Fetch Context
@@ -53,7 +54,7 @@ export const coachChat = onCall(async (request) => {
 
   const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || "";
   if (!apiKey) {
-    throw new HttpsError("failed-precondition", "AI API key not configured on server.");
+    throw new functions.https.HttpsError("failed-precondition", "AI API key not configured on server.");
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -76,7 +77,7 @@ export const coachChat = onCall(async (request) => {
       if (role === expectedRole) {
         geminiHistory.push({
           role: role,
-          parts: [{ text: msg.content }]
+          parts: [{text: msg.content}]
         });
         expectedRole = role === 'user' ? 'model' : 'user';
       }
@@ -100,35 +101,35 @@ export const coachChat = onCall(async (request) => {
     db.collection('conversations').add({
       userId,
       recipeId: targetRecipeId,
-      messages: [...messageHistory, { role: 'assistant', content: aiResponse }],
+      messages: [...messageHistory, {role: 'assistant', content: aiResponse}],
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     }).catch(console.error);
 
-    return { response: aiResponse };
+    return {response: aiResponse};
   } catch (error) {
     console.error("Gemini Execution Error:", error);
-    throw new HttpsError("internal", "AI Service currently unavailable.");
+    throw new functions.https.HttpsError("internal", "AI Service currently unavailable.");
   }
 });
 
 /**
  * CLOUD FUNCTION: saveUserContext
  */
-export const saveUserContext = onCall(async (request) => {
-  if (!request.auth) throw new HttpsError("unauthenticated", "Unauthorized.");
+export const saveUserContext = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+  if (!context.auth) throw new functions.https.HttpsError("unauthenticated", "Unauthorized.");
 
-  const { quarterlyGoal, weeklySentiment } = request.data;
+  const {quarterlyGoal, weeklySentiment} = data;
 
   try {
-    await db.collection("users").doc(request.auth.uid).set({
+    await db.collection("users").doc(context.auth.uid).set({
       quarterlyGoal,
       weeklySentiment,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+    }, {merge: true});
 
-    return { success: true };
+    return {success: true};
   } catch (e) {
     console.error("Firestore persistence failure:", e);
-    throw new HttpsError("internal", "Failed to save context.");
+    throw new functions.https.HttpsError("internal", "Failed to save context.");
   }
 });
