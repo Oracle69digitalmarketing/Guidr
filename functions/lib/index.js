@@ -6,12 +6,12 @@ const admin = require("firebase-admin");
 const generative_ai_1 = require("@google/generative-ai");
 admin.initializeApp();
 const db = admin.firestore();
-const SYSTEM_PROMPTS = {
-    weekly_review_v1: `You are "Review," a focused, systems-oriented productivity coach.
-Guide the user through a 5-step review: Celebration, Friction, Priority, Scheduling, and Intention.
-Ask ONLY ONE question at a time. Be concise and empathetic. Do not list all steps at once.`,
-    decision_matrix_v1: `You are "Decide," a logical decision-making coach using weighted matrices.`,
-    energy_audit_v1: `You are "Energy," a mindful sustainability coach.`
+const getPromptFromFirestore = async (promptId) => {
+    const promptDoc = await db.collection('prompts').doc(promptId).get();
+    if (!promptDoc.exists) {
+        return null;
+    }
+    return promptDoc.data()?.content;
 };
 exports.coachChat = (0, https_1.onCall)(async (request) => {
     if (!request.auth) {
@@ -20,8 +20,12 @@ exports.coachChat = (0, https_1.onCall)(async (request) => {
     const { recipeId, guidrId, messageHistory = [] } = request.data;
     const targetRecipeId = recipeId || guidrId;
     const userId = request.auth.uid;
-    if (!targetRecipeId || !SYSTEM_PROMPTS[targetRecipeId]) {
-        throw new https_1.HttpsError("invalid-argument", "Missing or invalid recipeId.");
+    if (!targetRecipeId) {
+        throw new https_1.HttpsError("invalid-argument", "Missing recipeId.");
+    }
+    const systemInstructionFromFirestore = await getPromptFromFirestore(targetRecipeId);
+    if (!systemInstructionFromFirestore) {
+        throw new https_1.HttpsError("not-found", `System instruction for recipeId: ${targetRecipeId} not found.`);
     }
     let userContextText = '';
     try {
@@ -43,7 +47,7 @@ exports.coachChat = (0, https_1.onCall)(async (request) => {
     const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
         model: "gemini-pro",
-        systemInstruction: SYSTEM_PROMPTS[targetRecipeId] + userContextText
+        systemInstruction: systemInstructionFromFirestore + userContextText
     });
     try {
         const geminiHistory = [];
