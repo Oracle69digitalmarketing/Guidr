@@ -4,6 +4,7 @@ exports.saveUserContext = exports.coachChat = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const generative_ai_1 = require("@google/generative-ai");
+const openai_1 = require("openai");
 admin.initializeApp();
 const db = admin.firestore();
 const getPromptFromFirestore = async (promptId) => {
@@ -12,6 +13,32 @@ const getPromptFromFirestore = async (promptId) => {
         return null;
     }
     return promptDoc.data()?.content;
+};
+const getOpenAICoachResponse = async (payload, systemInstruction, openaiApiKey) => {
+    if (!openaiApiKey) {
+        throw new functions.https.HttpsError("failed-precondition", "OpenAI API key not configured on server.");
+    }
+    const openai = new openai_1.default({ apiKey: openaiApiKey });
+    const messages = [
+        { role: "system", content: systemInstruction }
+    ];
+    for (const msg of payload.messageHistory) {
+        messages.push({
+            role: msg.role === 'user' ? 'user' : 'assistant',
+            content: msg.content
+        });
+    }
+    try {
+        const chatCompletion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: messages,
+        });
+        return chatCompletion.choices[0].message.content;
+    }
+    catch (error) {
+        console.error("OpenAI SDK Cloud Function Error:", error);
+        throw new functions.https.HttpsError("internal", "OpenAI Service currently unavailable.");
+    }
 };
 exports.coachChat = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -40,49 +67,58 @@ exports.coachChat = functions.https.onCall(async (data, context) => {
     catch (e) {
         console.warn("User context unavailable for current request.");
     }
-    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || "";
-    if (!apiKey) {
-        throw new functions.https.HttpsError("failed-precondition", "AI API key not configured on server.");
+    const combinedSystemInstruction = systemInstructionFromFirestore + userContextText;
+    const AI_PROVIDER = functions.config().ai?.provider || 'gemini';
+    const OPENAI_API_KEY = functions.config().openai?.api_key || "";
+    let aiResponse = null;
+    if (AI_PROVIDER === 'openai') {
+        aiResponse = await getOpenAICoachResponse(data, combinedSystemInstruction, OPENAI_API_KEY);
     }
-    const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-        model: "gemini-pro",
-        systemInstruction: systemInstructionFromFirestore + userContextText
-    });
-    try {
-        const geminiHistory = [];
-        let expectedRole = 'user';
-        for (const msg of messageHistory.slice(0, -1)) {
-            const role = msg.role === 'user' ? 'user' : 'model';
-            if (role === expectedRole) {
-                geminiHistory.push({
-                    role: role,
-                    parts: [{ text: msg.content }]
-                });
-                expectedRole = role === 'user' ? 'model' : 'user';
-            }
+    else {
+        const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || "";
+        if (!apiKey) {
+            throw new functions.https.HttpsError("failed-precondition", "Gemini AI API key not configured on server.");
         }
-        if (geminiHistory.length > 0 && geminiHistory[geminiHistory.length - 1].role === 'user') {
-            geminiHistory.pop();
-        }
-        const chat = model.startChat({
-            history: geminiHistory,
+        const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-flash",
+            systemInstruction: combinedSystemInstruction
         });
-        const lastMessage = messageHistory[messageHistory.length - 1];
-        const result = await chat.sendMessage(lastMessage.content);
-        const aiResponse = result.response.text();
-        db.collection('conversations').add({
-            userId,
-            recipeId: targetRecipeId,
-            messages: [...messageHistory, { role: 'assistant', content: aiResponse }],
-            timestamp: admin.firestore.FieldValue.serverTimestamp()
-        }).catch(console.error);
-        return { response: aiResponse };
+        try {
+            const geminiHistory = [];
+            let expectedRole = 'user';
+            for (const msg of messageHistory.slice(0, -1)) {
+                const role = msg.role === 'user' ? 'user' : 'model';
+                if (role === expectedRole) {
+                    geminiHistory.push({
+                        role: role,
+                        parts: [{ text: msg.content }]
+                    });
+                    expectedRole = role === 'user' ? 'model' : 'user';
+                }
+            }
+            if (geminiHistory.length > 0 && geminiHistory[geminiHistory.length - 1].role === 'user') {
+                geminiHistory.pop();
+            }
+            const chat = model.startChat({
+                history: geminiHistory,
+            });
+            const lastMessage = messageHistory[messageHistory.length - 1];
+            const result = await chat.sendMessage(lastMessage.content);
+            aiResponse = result.response.text();
+        }
+        catch (error) {
+            console.error("Gemini Execution Error:", error);
+            throw new functions.https.HttpsError("internal", "AI Service currently unavailable.");
+        }
     }
-    catch (error) {
-        console.error("Gemini Execution Error:", error);
-        throw new functions.https.HttpsError("internal", "AI Service currently unavailable.");
-    }
+    db.collection('conversations').add({
+        userId,
+        recipeId: targetRecipeId,
+        messages: [...messageHistory, { role: 'assistant', content: aiResponse }],
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+    }).catch(console.error);
+    return { response: aiResponse };
 });
 exports.saveUserContext = functions.https.onCall(async (data, context) => {
     if (!context.auth)

@@ -3,6 +3,7 @@ import * as functions from "firebase-functions";
 
 import * as admin from "firebase-admin";
 import {GoogleGenerativeAI} from "@google/generative-ai";
+import OpenAI from 'openai';
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -13,6 +14,35 @@ const getPromptFromFirestore = async (promptId: string) => {
     return null;
   }
   return promptDoc.data()?.content;
+};
+
+const getOpenAICoachResponse = async (payload: any, systemInstruction: string, openaiApiKey: string) => {
+  if (!openaiApiKey) {
+    throw new functions.https.HttpsError("failed-precondition", "OpenAI API key not configured on server.");
+  }
+
+  const openai = new OpenAI({ apiKey: openaiApiKey });
+  const messages: any[] = [
+    { role: "system", content: systemInstruction }
+  ];
+
+  for (const msg of payload.messageHistory) {
+    messages.push({
+      role: msg.role === 'user' ? 'user' : 'assistant',
+      content: msg.content
+    });
+  }
+
+  try {
+    const chatCompletion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // or "gpt-4"
+      messages: messages,
+    });
+    return chatCompletion.choices[0].message.content;
+  } catch (error) {
+    console.error("OpenAI SDK Cloud Function Error:", error);
+    throw new functions.https.HttpsError("internal", "OpenAI Service currently unavailable.");
+  }
 };
 
 /**
@@ -52,64 +82,75 @@ export const coachChat = functions.https.onCall(async (data: any, context: funct
     console.warn("User context unavailable for current request.");
   }
 
-  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || "";
-  if (!apiKey) {
-    throw new functions.https.HttpsError("failed-precondition", "AI API key not configured on server.");
-  }
+  const combinedSystemInstruction = systemInstructionFromFirestore + userContextText;
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    systemInstruction: systemInstructionFromFirestore + userContextText
-  });
+  const AI_PROVIDER = functions.config().ai?.provider || 'gemini';
+  const OPENAI_API_KEY = functions.config().openai?.api_key || "";
 
-  try {
-    // Gemini requires the history to:
-    // 1. Start with a 'user' message.
-    // 2. Alternate between 'user' and 'model'.
-    // 3. End with a 'model' message before we send the next 'user' message.
-    const geminiHistory: any[] = [];
-    let expectedRole = 'user';
+  let aiResponse: string | null = null;
 
-    // We iterate through all messages EXCEPT the last one (which we will send via sendMessage)
-    for (const msg of messageHistory.slice(0, -1)) {
-      const role = msg.role === 'user' ? 'user' : 'model';
-      if (role === expectedRole) {
-        geminiHistory.push({
-          role: role,
-          parts: [{text: msg.content}]
-        });
-        expectedRole = role === 'user' ? 'model' : 'user';
-      }
+  if (AI_PROVIDER === 'openai') {
+    aiResponse = await getOpenAICoachResponse(data, combinedSystemInstruction, OPENAI_API_KEY);
+  } else {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || "";
+    if (!apiKey) {
+      throw new functions.https.HttpsError("failed-precondition", "Gemini AI API key not configured on server.");
     }
 
-    // Ensure history ends with a 'model' message so the next sendMessage('user') is valid.
-    if (geminiHistory.length > 0 && geminiHistory[geminiHistory.length - 1].role === 'user') {
-      geminiHistory.pop();
-    }
-
-    // Convert messageHistory to Google Generative AI format
-    const chat = model.startChat({
-      history: geminiHistory,
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: combinedSystemInstruction
     });
 
-    const lastMessage = messageHistory[messageHistory.length - 1];
-    const result = await chat.sendMessage(lastMessage.content);
-    const aiResponse = result.response.text();
+    try {
+      // Gemini requires the history to:
+      // 1. Start with a 'user' message.
+      // 2. Alternate between 'user' and 'model'.
+      // 3. End with a 'model' message before we send the next 'user' message.
+      const geminiHistory: any[] = [];
+      let expectedRole = 'user';
 
-    // Async history logging (doesn't block response)
-    db.collection('conversations').add({
-      userId,
-      recipeId: targetRecipeId,
-      messages: [...messageHistory, {role: 'assistant', content: aiResponse}],
-      timestamp: admin.firestore.FieldValue.serverTimestamp()
-    }).catch(console.error);
+      // We iterate through all messages EXCEPT the last one (which we will send via sendMessage)
+      for (const msg of messageHistory.slice(0, -1)) {
+        const role = msg.role === 'user' ? 'user' : 'model';
+        if (role === expectedRole) {
+          geminiHistory.push({
+            role: role,
+            parts: [{text: msg.content}]
+          });
+          expectedRole = role === 'user' ? 'model' : 'user';
+        }
+      }
 
-    return {response: aiResponse};
-  } catch (error) {
-    console.error("Gemini Execution Error:", error);
-    throw new functions.https.HttpsError("internal", "AI Service currently unavailable.");
+      // Ensure history ends with a 'model' message so the next sendMessage('user') is valid.
+      if (geminiHistory.length > 0 && geminiHistory[geminiHistory.length - 1].role === 'user') {
+        geminiHistory.pop();
+      }
+
+      // Convert messageHistory to Google Generative AI format
+      const chat = model.startChat({
+        history: geminiHistory,
+      });
+
+      const lastMessage = messageHistory[messageHistory.length - 1];
+      const result = await chat.sendMessage(lastMessage.content);
+      aiResponse = result.response.text();
+    } catch (error) {
+      console.error("Gemini Execution Error:", error);
+      throw new functions.https.HttpsError("internal", "AI Service currently unavailable.");
+    }
   }
+
+  // Async history logging (doesn't block response)
+  db.collection('conversations').add({
+    userId,
+    recipeId: targetRecipeId,
+    messages: [...messageHistory, {role: 'assistant', content: aiResponse}],
+    timestamp: admin.firestore.FieldValue.serverTimestamp()
+  }).catch(console.error);
+
+  return {response: aiResponse};
 });
 
 /**
