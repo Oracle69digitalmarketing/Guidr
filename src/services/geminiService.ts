@@ -37,7 +37,7 @@ export const getCoachResponse = async (payload: SendMessagePayload, userContextS
     (userContextStr ? `\n\nAbout the user: ${userContextStr}` : "");
 
   const model = genAI.getGenerativeModel({
-    model: "gemini-pro",
+    model: "gemini-1.5-flash",
     systemInstruction
   });
 
