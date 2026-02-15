@@ -59,7 +59,7 @@ export const coachChat = functions.https.onCall(async (data: any, context: funct
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-pro",
+    model: "gemini-1.5-flash",
     systemInstruction: systemInstructionFromFirestore + userContextText
   });
 
