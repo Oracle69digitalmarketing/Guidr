@@ -12,7 +12,7 @@ class MainApplication : Application() {
         // Configure RevenueCat
         Purchases.logLevel = LogLevel.DEBUG
         Purchases.configure(
-            PurchasesConfiguration.Builder(this, "test_XCOYiEfpVVykznqYLMGPqPAjwvt")
+            PurchasesConfiguration.Builder(this, "test_ViChLwDMunuBdhcJpFeNVPCoqZt")
                 .build()
         )
     }

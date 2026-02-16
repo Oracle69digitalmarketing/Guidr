@@ -76,8 +76,8 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
-    implementation "com.revenuecat.purchases:purchases:9.20.2"
-    // implementation "com.revenuecat.purchases:purchases-ui:9.20.2"
+implementation "com.revenuecat.purchases:purchases:9.21.0"
+    implementation "com.revenuecat.purchases:purchases-ui:9.21.0"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
