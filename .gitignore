@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Android Signing Files
+my-upload-key.jks
+/android/gradle.properties
+
+# Downloaded Android SDK Tools
+commandlinetools-linux-11076708_latest.zip
